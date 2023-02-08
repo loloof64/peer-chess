@@ -3,8 +3,8 @@ import GamePage from '../pages/GamePage.vue'
 import CameraPreviewPage from '../pages/CameraPreviewPage.vue';
 
 const routes = [
-    {path: '/', component: GamePage},
-    {path: '/camera-preview', CameraPreviewPage}
+    {path: '/', component: CameraPreviewPage},
+    {path: '/game', GamePage}
 ]
 
 export default createRouter({

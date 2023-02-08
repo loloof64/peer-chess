@@ -1,11 +1,22 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 
-const camera = ref()
+const video = ref()
 
 const audioInputSelect = ref()
 const audioOutputSelect = ref()
-const videoSelect = ref()
+const videoSelect = ref();
+
+import { default as MicrophoneOn } from '@renderer/assets/vectors/mic.svg'
+import { default as MicrophoneOff } from '@renderer/assets/vectors/mic-off.svg'
+
+import { default as VideoOn } from '@renderer/assets/vectors/video.svg'
+import { default as VideoOff } from '@renderer/assets/vectors/video-off.svg'
+
+const audioEnabled = ref();
+const videoEnabled = ref();
+const microLogo = computed(() => audioEnabled.value ? MicrophoneOn : MicrophoneOff)
+const videoLogo = computed(() => videoEnabled.value ? VideoOn : VideoOff)
 
 const widthPx = 500
 const heightPx = 300
@@ -76,7 +87,9 @@ function changeAudioDestination() {
 
 async function gotStream(stream) {
     window.stream = stream;
-    camera.value.srcObject = stream;
+    video.value.srcObject = stream;
+    videoEnabled.value = true;
+    audioEnabled.value = true;
     // Refresh button list in case labels have become available
     return await navigator.mediaDevices.enumerateDevices();
 }
@@ -97,6 +110,24 @@ function start() {
     navigator.mediaDevices.getUserMedia(constraints).then(gotStream).then(gotDevices).catch(handleError);
 }
 
+function toggleAudio() {
+    if (window.stream) {
+        window.stream.getAudioTracks().forEach(track => {
+            track.enabled = !track.enabled
+            audioEnabled.value = track.enabled
+        })
+    }
+}
+
+function toggleVideo() {
+    if (window.stream) {
+        window.stream.getVideoTracks().forEach(track => {
+            track.enabled = !track.enabled
+            videoEnabled.value = track.enabled
+        })
+    }
+}
+
 onMounted(() => {
     selectors = [audioInputSelect.value, audioOutputSelect.value, videoSelect.value]
     navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(handleError);
@@ -112,9 +143,15 @@ onMounted(() => {
 
 <template>
     <div id="main_container">
-        <video ref="camera" class="camera" autoplay></video>
+        <div id="video_zone">
+            <video ref="video" class="video" playsinline autoplay></video>
+            <div id="options_zone">
+                <img :src="microLogo" @click="toggleAudio" />
+                <img :src="videoLogo" @click="toggleVideo" />
+            </div>
+        </div>
 
-        <div id="controls_zone">
+        <div id="stream_controls_zone">
 
 
             <label for="audioInput">Microphone</label>
@@ -125,9 +162,8 @@ onMounted(() => {
             <select name="audioOutput" ref="audioOutputSelect"></select>
 
 
-            <label for="video">Camera</label>
+            <label for="video">Video</label>
             <select name="video" ref="videoSelect"></select>
-
         </div>
     </div>
 </template>
@@ -142,15 +178,31 @@ onMounted(() => {
     border-radius: 10px;
 }
 
-.camera {
+#video_zone {
+    position: relative;
     background-color: black;
     width: v-bind(widthPx + 'px');
     height: v-bind(heightPx + 'px');
 }
 
-#controls_zone {
+.video {
+    width: v-bind(widthPx + 'px');
+    height: v-bind(heightPx + 'px');
+}
+
+#options_zone {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-color: aqua;
+    z-index: 5;
+    display: flex;
+    flex-direction: row;
+}
+
+#stream_controls_zone {
     display: grid;
-    grid-template: 
+    grid-template:
         "a a"
         "a a"
         "a a";

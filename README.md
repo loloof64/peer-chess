@@ -28,4 +28,5 @@ $ npm run build:linux
 
 ## Credits
 
-Icon downloaded from https://www.svgrepo.com/svg/188982/knight-chess
+*) Icon downloaded from https://www.svgrepo.com/svg/188982/knight-chess
+*) Some vectors have been downloaded from https://feathericons.com/
