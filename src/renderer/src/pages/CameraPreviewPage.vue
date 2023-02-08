@@ -1,20 +1,23 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
-const camera = ref();
+const camera = ref()
 
-const audioInputSelect = ref();
-const audioOutputSelect = ref();
-const videoSelect = ref();
+const audioInputSelect = ref()
+const audioOutputSelect = ref()
+const videoSelect = ref()
 
-const selectors = [audioInputSelect, audioOutputSelect, videoSelect];
+const widthPx = 500
+const heightPx = 300
+
+let selectors = []
 
 function gotDevices(deviceInfos) {
     // Handles being called several times to update labels. Preserve values.
-    const values = selectors.map(select => select.value);
+    const values = selectors.map(select => select.value)
     selectors.forEach(select => {
-        while (select.value.firstChild) {
-            select.value.removeChild(select.value.firstChild);
+        while (select.firstChild) {
+            select.removeChild(select.firstChild);
         }
     });
     for (let i = 0; i !== deviceInfos.length; ++i) {
@@ -34,15 +37,16 @@ function gotDevices(deviceInfos) {
             console.log('Some other kind of source/device: ', deviceInfo);
         }
     }
+
     selectors.forEach((select, selectorIndex) => {
-        if (Array.prototype.slice.call(select.value.childNodes).some(n => n.value === values[selectorIndex].value)) {
-            select.value = values[selectorIndex].value;
+        if (Array.prototype.slice.call(select.childNodes).some(n => n.value === values[selectorIndex])) {
+            select.value = values[selectorIndex];
         }
     });
 }
 
 function handleError(error) {
-    console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
+    console.log('Media devices error: ', error.message);
 }
 
 // Attach audio output device to video element using device/sink ID.
@@ -67,13 +71,12 @@ function attachSinkId(element, sinkId) {
 }
 
 function changeAudioDestination() {
-    const audioDestination = audioOutputSelect.value;
-    attachSinkId(videoSelect.value, audioDestination.value);
+    attachSinkId(videoSelect, audioOutputSelect.value);
 }
 
 function gotStream(stream) {
-    window.stream = stream; // make stream available to console
-    videoSelect.srcObject = stream;
+    window.stream = stream;
+    camera.value.srcObject = stream;
     // Refresh button list in case labels have become available
     return navigator.mediaDevices.enumerateDevices();
 }
@@ -87,14 +90,20 @@ function start() {
     const audioSource = audioInputSelect.value.value;
     const videoSource = videoSelect.value.value;
 
+    ///////////////////////////////////////
+    console.log(audioSource)
+    console.log(videoSource)
+    ///////////////////////////////////////
+
     const constraints = {
         audio: { deviceId: audioSource ? { exact: audioSource } : undefined },
-        video: { deviceId: videoSource ? { exact: videoSource } : undefined }
+        video: { deviceId: videoSource ? { exact: videoSource, width: widthPx, height: heightPx } : undefined }
     };
     navigator.mediaDevices.getUserMedia(constraints).then(gotStream).then(gotDevices).catch(handleError);
 }
 
 onMounted(() => {
+    selectors = [audioInputSelect.value, audioOutputSelect.value, videoSelect.value]
     navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(handleError);
 
     audioInputSelect.value.onchange = start;
@@ -139,8 +148,8 @@ onMounted(() => {
 
 .camera {
     background-color: black;
-    width: 500;
-    height: 300;
+    width: v-bind(widthPx+'px');
+    height: v-bind(heightPx+'px');
 }
 
 .component_line {
