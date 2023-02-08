@@ -74,11 +74,11 @@ function changeAudioDestination() {
     attachSinkId(videoSelect, audioOutputSelect.value);
 }
 
-function gotStream(stream) {
+async function gotStream(stream) {
     window.stream = stream;
     camera.value.srcObject = stream;
     // Refresh button list in case labels have become available
-    return navigator.mediaDevices.enumerateDevices();
+    return await navigator.mediaDevices.enumerateDevices();
 }
 
 function start() {
@@ -89,11 +89,6 @@ function start() {
     }
     const audioSource = audioInputSelect.value.value;
     const videoSource = videoSelect.value.value;
-
-    ///////////////////////////////////////
-    console.log(audioSource)
-    console.log(videoSource)
-    ///////////////////////////////////////
 
     const constraints = {
         audio: { deviceId: audioSource ? { exact: audioSource } : undefined },
@@ -117,22 +112,23 @@ onMounted(() => {
 
 <template>
     <div id="main_container">
-        <video ref="camera" class="camera"></video>
+        <video ref="camera" class="camera" autoplay></video>
 
-        <span class="component_line">
+        <div id="controls_zone">
+
+
             <label for="audioInput">Microphone</label>
             <select name="audioInput" ref="audioInputSelect"></select>
-        </span>
 
-        <span class="component_line">
+
             <label for="audioOutput">Speaker</label>
             <select name="audioOutput" ref="audioOutputSelect"></select>
-        </span>
 
-        <span class="component_line">
-            <label for="video">Speaker</label>
+
+            <label for="video">Camera</label>
             <select name="video" ref="videoSelect"></select>
-        </span>
+
+        </div>
     </div>
 </template>
 
@@ -148,14 +144,15 @@ onMounted(() => {
 
 .camera {
     background-color: black;
-    width: v-bind(widthPx+'px');
-    height: v-bind(heightPx+'px');
+    width: v-bind(widthPx + 'px');
+    height: v-bind(heightPx + 'px');
 }
 
-.component_line {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
+#controls_zone {
+    display: grid;
+    grid-template: 
+        "a a"
+        "a a"
+        "a a";
 }
 </style>
