@@ -1,7 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
 import { useMediaStore } from '@renderer/stores/media'
+
+const {t} = useI18n()
 
 const mediaStore = useMediaStore()
 const {videoSourceId, audioSourceId} = storeToRefs(mediaStore)
@@ -21,7 +24,7 @@ onMounted(() => {
 <template>
     <div id="main_zone">
         <loloof64-chessboard ref="board" size="500" />
-        <button @click="newGame">New game</button>
+        <button @click="newGame">{{ t('start_new_game') }}</button>
     </div>
 </template>
 

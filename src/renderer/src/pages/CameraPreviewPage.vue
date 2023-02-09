@@ -2,10 +2,13 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
 import { useMediaStore } from '@renderer/stores/media'
 
 const widthPx = 500
 const heightPx = 300
+
+const {t} = useI18n()
 
 const mediaStore = useMediaStore()
 const {videoSourceId, audioSourceId} = storeToRefs(mediaStore)
@@ -45,13 +48,13 @@ function gotDevices(deviceInfos) {
         const option = document.createElement('option');
         option.value = deviceInfo.deviceId;
         if (deviceInfo.kind === 'audioinput') {
-            option.text = deviceInfo.label || `microphone ${audioInputSelect.value.length + 1}`;
+            option.text = deviceInfo.label || `${t("device_microphone")} ${audioInputSelect.value.length + 1}`;
             audioInputSelect.value.appendChild(option);
         } else if (deviceInfo.kind === 'audiooutput') {
-            option.text = deviceInfo.label || `speaker ${audioOutputSelect.value.length + 1}`;
+            option.text = deviceInfo.label || `${t("device_speaker")} ${audioOutputSelect.value.length + 1}`;
             audioOutputSelect.value.appendChild(option);
         } else if (deviceInfo.kind === 'videoinput') {
-            option.text = deviceInfo.label || `camera ${videoSelect.value.length + 1}`;
+            option.text = deviceInfo.label || `${t("device_video")} ${videoSelect.value.length + 1}`;
             videoSelect.value.appendChild(option);
         } else {
             console.log('Some other kind of source/device: ', deviceInfo);
@@ -169,20 +172,20 @@ onMounted(() => {
         <div id="stream_controls_zone">
 
 
-            <label for="audioInput">Microphone</label>
+            <label for="audioInput">{{ t('device_microphone') }}</label>
             <select name="audioInput" ref="audioInputSelect"></select>
 
 
-            <label for="audioOutput">Speaker</label>
+            <label for="audioOutput">{{ t('device_speaker') }}</label>
             <select name="audioOutput" ref="audioOutputSelect"></select>
 
 
-            <label for="video">Video</label>
+            <label for="video">{{ t('device_video') }}</label>
             <select name="video" ref="videoSelect"></select>
         </div>
 
         <button @click="goToGamePage">
-            Go to game page
+            {{ t("goto_gamepage") }}
         </button>
     </div>
 </template>
