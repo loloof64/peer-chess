@@ -23,6 +23,7 @@
     "@electron-toolkit/preload": "^1.0.3",
     "@electron-toolkit/utils": "^1.0.2",
     "@loloof64/chessboard-component": "^0.25.0",
+    "pinia": "^2.0.30",
     "vue-router": "^4.1.6"
   },
   "devDependencies": {

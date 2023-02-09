@@ -1,5 +1,17 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useMediaStore } from '@renderer/stores/media'
+
+const widthPx = 500
+const heightPx = 300
+
+const mediaStore = useMediaStore()
+const {videoSourceId, audioSourceId} = storeToRefs(mediaStore)
+const {setVideoSourceId, setAudioSourceId} = mediaStore
+
+const router = useRouter();
 
 const video = ref()
 
@@ -17,9 +29,6 @@ const audioEnabled = ref();
 const videoEnabled = ref();
 const microLogo = computed(() => audioEnabled.value ? MicrophoneOn : MicrophoneOff)
 const videoLogo = computed(() => videoEnabled.value ? VideoOn : VideoOff)
-
-const widthPx = 500
-const heightPx = 300
 
 let selectors = []
 
@@ -128,6 +137,12 @@ function toggleVideo() {
     }
 }
 
+function goToGamePage() {
+    setAudioSourceId(audioInputSelect.value.value)
+    setVideoSourceId(videoSelect.value.value)
+    router.push('/game')
+}
+
 onMounted(() => {
     selectors = [audioInputSelect.value, audioOutputSelect.value, videoSelect.value]
     navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(handleError);
@@ -165,6 +180,10 @@ onMounted(() => {
             <label for="video">Video</label>
             <select name="video" ref="videoSelect"></select>
         </div>
+
+        <button @click="goToGamePage">
+            Go to game page
+        </button>
     </div>
 </template>
 
